@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const fs = require('fs');
 const bodyParser = require("body-parser");
+const { json } = require('express');
 const urlencodedParser = bodyParser.json();
 
 const app = express()
@@ -29,15 +30,34 @@ app.use(cors())
 app.get('/',  (req, res) => {
   fs.readFile("cars.json", "utf8", 
     function(error,data){
-      console.log(data);
+      if(error) throw error
       res.send(data)
     });
 })
-app.put('/',  (req, res) => {
-  
+app.post('/', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
   fs.readFile("cars.json", "utf8", 
-    function(error,data){
-      console.log(data);
-      res.send(data)
+    function(error,data){;
+      if(error) throw error;
+      let cars = JSON.parse(data)
+      cars.push(req.body)
+      fs.writeFile("cars.json", JSON.stringify(cars), function(error){
+        if(error) throw error; // sent error
+        res.sendStatus(200)
     });
+    });
+})
+app.delete('/', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  console.log('BODY',req.body);
+  // fs.readFile("cars.json", "utf8", 
+  //   function(error,data){;
+  //     if(error) throw error;
+  //     let cars = JSON.parse(data)
+  //     cars.push(req.body)
+  //     fs.writeFile("cars.json", JSON.stringify(cars), function(error){
+  //       if(error) throw error; // sent error
+  //       res.sendStatus(200)
+  //   });
+  // });
 })
