@@ -49,15 +49,40 @@ app.post('/', urlencodedParser, (req, res) => {
 })
 app.delete('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
-  console.log('BODY',req.body);
-  // fs.readFile("cars.json", "utf8", 
-  //   function(error,data){;
-  //     if(error) throw error;
-  //     let cars = JSON.parse(data)
-  //     cars.push(req.body)
-  //     fs.writeFile("cars.json", JSON.stringify(cars), function(error){
-  //       if(error) throw error; // sent error
-  //       res.sendStatus(200)
-  //   });
-  // });
+  fs.readFile("cars.json", "utf8", 
+    function(error,data){;
+      if(error) throw error;
+      let i
+      let cars = JSON.parse(data).map((e,idx) => {
+          if(e.id === JSON.parse(req.body.carId)){
+            i = idx
+            return e
+          } else {
+            return e
+          }
+      })
+      cars.splice(i,1)
+      fs.writeFile("cars.json", JSON.stringify(cars), function(error){
+        if(error) throw error; // sent error
+        res.sendStatus(200)
+      });
+  });
+})
+app.put('/', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  fs.readFile("cars.json", "utf8", 
+    function(error,data){;
+      if(error) throw error;
+      let cars = JSON.parse(data).map((e) => {
+          if(e.id === req.body.id){
+            return req.body
+          } else {
+            return e
+          }
+      })
+      fs.writeFile("cars.json", JSON.stringify(cars), function(error){
+        if(error) throw error; // sent error
+        res.sendStatus(200)
+      });
+  });
 })
