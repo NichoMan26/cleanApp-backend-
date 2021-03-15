@@ -30,7 +30,6 @@ conn.connect(err=>{
   }
 })
 
-let query = 'SELECT * FROM cars'
 
 
 
@@ -52,6 +51,20 @@ app.use((req, res, next) => {
 app.use(cors())
 
 app.get('/',  (req, res) => {
+  let date = new Date()
+    let year = date.getFullYear()
+    let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
+    let day = date.getDate()
+  let toDay = year +'-' + month +'-' + day
+    conn.query(`SELECT * FROM cars WHERE date > '${toDay}'`,(err,result) => {
+      if(err){
+        console.log('err: ', err);
+      } 
+      res.send(result)
+    })
+})
+
+app.get('/all',  (req, res) => {
   conn.query('SELECT * FROM cars',(err,result) => {
   res.send(result)
   })
