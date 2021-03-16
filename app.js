@@ -1,5 +1,4 @@
 const express = require('express')
-const nodemailer = require('nodemailer')
 const cors = require('cors')
 const mailer = require('./nodeMailer.js')
 const mysql = require('mysql')
@@ -30,9 +29,6 @@ conn.connect(err=>{
   }
 })
 
-
-
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
 
@@ -56,7 +52,7 @@ app.get('/',  (req, res) => {
     let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
     let day = date.getDate()
   let toDay = year +'-' + month +'-' + day
-    conn.query(`SELECT * FROM cars WHERE date > '${toDay}'`,(err,result) => {
+    conn.query(`SELECT * FROM carsV WHERE date > '${toDay}'`,(err,result) => {
       if(err){
         console.log('err: ', err);
       } 
@@ -65,16 +61,15 @@ app.get('/',  (req, res) => {
 })
 
 app.get('/all',  (req, res) => {
-  conn.query('SELECT * FROM cars',(err,result) => {
+  conn.query('SELECT * FROM carsV',(err,result) => {
   res.send(result)
   })
 })
 
-
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
-  let query = `INSERT INTO cars 
+  let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
   values('${r.id}','${r.car || ''}','${r.creater}','${r.place}','${r.number || ''}','${r.service}','${r.washer || ''}','${r.comment || ''}')`
   conn.query(query, (err,result) => {
@@ -87,7 +82,7 @@ app.post('/', urlencodedParser, (req, res) => {
 
 app.delete('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
-  let query = `DELETE FROM cars WHERE id='${req.body.carId}'`
+  let query = `DELETE FROM carsV WHERE id='${req.body.carId}'`
   conn.query(query, (err,result) => {
     if(err) {
       console.log(err)
@@ -99,7 +94,7 @@ app.delete('/', urlencodedParser, (req, res) => {
 app.put('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
-  let query = `UPDATE cars SET 
+  let query = `UPDATE carsV SET 
       id='${r.id}',car='${r.car}',creater='${r.creater}',
       place='${r.place}',number='${r.number}',service='${r.service}',
       washer='${r.washer}',comment='${r.comment}' 
@@ -112,68 +107,32 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
+app.get('/mail', (req, res) => {
+  let date = new Date()
+    let year = date.getFullYear()
+    let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
+    let day = date.getDate()
+  let toDay = year +'-' + month +'-' + day
+  conn.query(`SELECT * FROM carsV WHERE date > '${toDay}'`,(err,result) => {
+    let d = new Date()
+    let output = result.reduce((acc = '', e ,idx, result) => {
+      console.log(e.date);
+      return acc += `<p><b>Машина:</b>${e.car}
+                        <b>Номер:</b>${e.number} 
+                        <b>Место:</b>${e.place === 'K' ? 'Керава' : 'Ванта'} 
+                        <b>Тип мойки:</b>${e.service} 
+                        <b>Мойщик:</b>${e.washer} ${e.creater}
+                        <b>Комментарий:</b> ${e.comment} 
+                        <b>Дата:</b>${e.date.getDate()+'-'+e.date.getMonth()+'-'+e.date.getFullYear()+' '+e.date.getHours()+':'+e.date.getMinutes()}</p>`
+    })
+    const message = {
+      from:'Bilar <karlgromov80@mail.ru>',
+      to: "bilar99get@gmail.com", // list of receivers
+      subject: 'lol', // Subject line
+      text: 'body', 
+      html: output, // html body
+    }
+    mailer(message)
+    })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// app.get('/mail', (req, res) => {
-//   const message = {
-//     to: "jet.li.64@list.ru", // list of receivers
-//     subject: "Hello ✔", // Subject line
-//     text: "Hello world?", // plain text body
-//     html: "<b>Hello world?</b>", // html body
-//   }
-//   mailer(message)
-  
-
-// })
-
-// async function main() {
-//   // Generate test SMTP service account from ethereal.email
-//   // Only needed if you don't have a real mail account for testing
-//   let testAccount = await nodemailer.createTestAccount();
-
-//   // create reusable transporter object using the default SMTP transport
-//   let transporter = nodemailer.createTransport({
-//     host: "smtp.ethereal.email",
-//     port: 587,
-//     secure: false, // true for 465, false for other ports
-//     auth: {
-//       user: testAccount.user, // generated ethereal user
-//       pass: testAccount.pass, // generated ethereal password
-//     },
-//   });
-
-//   // send mail with defined transport object
-//   let info = await transporter.sendMail({
-//     from: '"Fred Foo 👻" <foo@example.com>', // sender address
-//     to: "jet.li.64@list.ru", // list of receivers
-//     subject: "Hello ✔", // Subject line
-//     text: "Hello world?", // plain text body
-//     html: "<b>Hello world?</b>", // html body
-//   });
-
-//   console.log("Message sent: %s", info.messageId);
-//   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-//   // Preview only available when sending through an Ethereal account
-//   console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-//   // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-// }
-
-// main().catch(console.error);
+})
