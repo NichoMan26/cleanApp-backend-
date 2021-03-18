@@ -79,6 +79,23 @@ app.post('/', urlencodedParser, (req, res) => {
     res.sendStatus(200)
   })
 })
+app.post('/report', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  let fromTS =  new Date(req.body.from).getTime()
+  console.log('fromTS: ', fromTS);
+  let toTS =  new Date(req.body.to).getTime()
+  console.log('toTS: ', toTS);
+ let query = `SELECT *
+              FROM carsV
+              WHERE id BETWEEN ${fromTS} AND ${toTS};`
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      }
+      // console.log('result: ', result);
+      res.send(result)
+  })
+})
 
 app.delete('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
@@ -113,7 +130,8 @@ app.get('/mail', (req, res) => {
     let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
     let day = date.getDate()
   let toDay = year +'-' + month +'-' + day
-  conn.query(`SELECT * FROM carsV WHERE date > '${toDay}'`,(err,result) => {
+  conn.query(`SELECT * FROM carsV`,(err,result) => {
+    console.log('result: ', result);
     let d = new Date()
     let output = result.reduce((acc = '', e ,idx, result) => {
       console.log(e.date);
