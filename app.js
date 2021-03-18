@@ -82,17 +82,27 @@ app.post('/', urlencodedParser, (req, res) => {
 app.post('/report', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let fromTS =  new Date(req.body.from).getTime()
-  console.log('fromTS: ', fromTS);
   let toTS =  new Date(req.body.to).getTime()
-  console.log('toTS: ', toTS);
- let query = `SELECT *
-              FROM carsV
-              WHERE id BETWEEN ${fromTS} AND ${toTS};`
+  let query = `SELECT *
+              FROM carsV WHERE`
+  let queryDate = ` id BETWEEN ${fromTS} AND ${toTS}`
+  let queryService = ''
+  query += queryDate
+  
+  if(req.body.service !== 'All'){
+     queryService = ` AND service = '${req.body.service}'`
+  }
+  if(req.body.washer !== 'All'){
+    query += ` AND washer = '${req.body.washer}'${queryService} OR${queryDate}${queryService} AND creater = '${req.body.washer}'`
+  } else {
+    query += queryService
+  }
+  console.log('query', query);
   conn.query(query, (err,result) => {
     if(err) {
       console.log(err)
       }
-      // console.log('result: ', result);
+      console.log('result: ', result);
       res.send(result)
   })
 })
