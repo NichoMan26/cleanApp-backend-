@@ -79,6 +79,7 @@ app.post('/', urlencodedParser, (req, res) => {
     res.sendStatus(200)
   })
 })
+
 app.post('/report', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let fromTS =  new Date(req.body.from).getTime()
@@ -97,7 +98,19 @@ app.post('/report', urlencodedParser, (req, res) => {
   } else {
     query += queryService
   }
-  console.log('query', query);
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      }
+      res.send(result)
+  })
+})
+
+app.post('/search', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  console.log(req.body.searchWord);
+  let query = `SELECT * FROM carsV WHERE number LIKE "%${req.body.searchWord }%"`
+  
   conn.query(query, (err,result) => {
     if(err) {
       console.log(err)
