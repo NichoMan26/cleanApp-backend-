@@ -120,6 +120,25 @@ app.post('/search', urlencodedParser, (req, res) => {
   })
 })
 
+app.post('/user', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  console.log(req.body);
+  let query = `SELECT * FROM users WHERE name LIKE "${req.body.name}" AND pass LIKE "${req.body.password}"`
+  
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      }
+      if(result[0]){
+      console.log('result[0]: ', result[0]);
+      res.send(result)
+    } else {
+      res.sendStatus(401)
+    }
+      
+  })
+})
+
 app.delete('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let query = `DELETE FROM carsV WHERE id='${req.body.carId}'`
