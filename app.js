@@ -167,7 +167,7 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
-cron.schedule('0 */1 * * * *', () => {
+cron.schedule('0 55 23 * * *', () => {
   let date = new Date()
   let year = date.getFullYear()
   let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
@@ -190,7 +190,7 @@ cron.schedule('0 */1 * * * *', () => {
     from:'Bilar <karlgromov80@mail.ru>',
     to: "bilar99get@gmail.com", // list of receivers
     subject: `${day}.${month}.${year}`, // Subject line
-    text: 'body', 
+    text: 'Кажется машин нет((', 
     html: output, // html body
   }
   mailer(message)
