@@ -166,7 +166,7 @@ app.put('/', urlencodedParser, (req, res) => {
     res.sendStatus(200)
   })
 })
-
+//some comments
 cron.schedule('0 55 23 * * *', () => {
   let date = new Date()
   let year = date.getFullYear()
@@ -189,7 +189,7 @@ cron.schedule('0 55 23 * * *', () => {
   const message = {
     from:'Bilar <karlgromov80@mail.ru>',
     to: "bilar99get@gmail.com", // list of receivers
-    subject: `${day}.${month}.${year}`, // Subject line
+    subject: `${day}.${month}.${year}`, // Subject lineg
     text: 'Кажется машин нет((', 
     html: output, // html body
   }
