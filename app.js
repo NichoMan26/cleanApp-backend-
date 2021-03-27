@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const mailer = require('./nodeMailer.js')
 const mysql = require('mysql')
+const cron = require('node-cron')
 
 
 const fs = require('fs');
@@ -166,33 +167,33 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
-app.get('/mail', (req, res) => {
+cron.schedule('0 0 0 * * *', () => {
   let date = new Date()
-    let year = date.getFullYear()
-    let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
-    let day = date.getDate()
+  let year = date.getFullYear()
+  let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
+  let day = date.getDate()
   let toDay = year +'-' + month +'-' + day
-  conn.query(`SELECT * FROM carsV`,(err,result) => {
-    console.log('result: ', result);
-    let d = new Date()
-    let output = result.reduce((acc = '', e ,idx, result) => {
-      console.log(e.date);
-      return acc += `<p><b>Машина:</b>${e.car}
-                        <b>Номер:</b>${e.number} 
-                        <b>Место:</b>${e.place === 'K' ? 'Керава' : 'Ванта'} 
-                        <b>Тип мойки:</b>${e.service} 
-                        <b>Мойщик:</b>${e.washer} ${e.creater}
-                        <b>Комментарий:</b> ${e.comment} 
-                        <b>Дата:</b>${e.date.getDate()+'-'+e.date.getMonth()+'-'+e.date.getFullYear()+' '+e.date.getHours()+':'+e.date.getMinutes()}</p>`
-    })
-    const message = {
-      from:'Bilar <karlgromov80@mail.ru>',
-      to: "bilar99get@gmail.com", // list of receivers
-      subject: 'lol', // Subject line
-      text: 'body', 
-      html: output, // html body
-    }
-    mailer(message)
-    })
-
+  conn.query(`SELECT * FROM carsV WHERE date LIKE '%${toDay}%'`,(err,r) => {
+    let output =''
+    for(let i = 0;i < r.length; i++){
+      output += `<p><b>Машина:</b>${r[i].car}
+      <b>Номер:</b>${r[i].number} 
+      <b>Место:</b>${r[i].place === 'K' ? 'Керава' : 'Ванта'} 
+      <b>Тип мойки:</b>${r[i].service} 
+      <b>Мойщик:</b>${r[i].washer} ${r[i].creater}
+      <b>Комментарий:</b> ${r[i].comment} 
+      <b>Дата:</b>${r[i].date.getDate()+'-'+r[i].date.getMonth()
+                    +'-'+r[i].date.getFullYear()+' '+r[i].date.getHours()+
+                    ':'+r[i].date.getMinutes()}</p>`
+  }
+  const message = {
+    from:'Bilar <karlgromov80@mail.ru>',
+    to: "bilar99get@gmail.com", // list of receivers
+    subject: `${day}.${month}.${year}`, // Subject line
+    text: 'body', 
+    html: output, // html body
+  }
+  mailer(message)
+  })
 })
+

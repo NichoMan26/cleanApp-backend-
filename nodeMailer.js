@@ -9,9 +9,6 @@ const transporter = nodemailer.createTransport({
     pass: 'sosok55555'
     
   }
-},  
-{
-  from: '"Boo 👻" <freddie.schuster@ethereal.email>', // sender address
 });
 
 const mailer = message => {
