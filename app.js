@@ -166,7 +166,7 @@ app.put('/', urlencodedParser, (req, res) => {
     res.sendStatus(200)
   })
 })
-cron.schedule('0 23 0 * * *', () => {
+cron.schedule('0 28 0 * * *', () => {
   const message = {
     from:'Bilar <karlgromov80@mail.ru>',
     to: "bilar99get@gmail.com", // list of receivers
