@@ -167,7 +167,7 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
-cron.schedule('55 23 */1 * *', () => {
+cron.schedule('59 23 */1 * *', () => {
   console.log('mail');
   let date = new Date()
   let year = date.getFullYear()
