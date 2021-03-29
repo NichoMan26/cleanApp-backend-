@@ -167,7 +167,7 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
-cron.schedule('0 55 23 * * *', () => {
+cron.schedule('45 23 * * *', () => {
   let date = new Date()
   let year = date.getFullYear()
   let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
