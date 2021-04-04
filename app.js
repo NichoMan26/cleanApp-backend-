@@ -3,6 +3,7 @@ const cors = require('cors')
 const mailer = require('./nodeMailer.js')
 const mysql = require('mysql')
 const cron = require('node-cron')
+const http = require('request')
 
 
 const fs = require('fs');
@@ -70,6 +71,7 @@ app.get('/all',  (req, res) => {
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
+  let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b>` //
   let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
   values('${r.id}','${r.car || ''}','${r.creater}','${r.place}','${r.number || ''}','${r.service}','${r.washer || ''}','${r.comment || ''}')`
@@ -77,7 +79,15 @@ app.post('/', urlencodedParser, (req, res) => {
     if(err) {
       console.log(err)
       }
-    res.sendStatus(200)
+      http.post(`https://api.telegram.org/bot1761813796:AAFkV2cazZksbj4SwtU-M3m40kkMlbjkBnY/sendMessage?chat_id=-519331457&parse_mode=html&text=${msg}`, 
+      function (error, response, body) {  
+        if(response.statusCode===200){
+          res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
+        }
+        if(response.statusCode!==200){
+          res.status(400).json({status: 'error', message: 'Произошла ошибка!'});
+        }
+      });
   })
 })
 
