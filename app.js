@@ -71,7 +71,7 @@ app.get('/all',  (req, res) => {
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
-  let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b>` //
+  let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b>KOMMENTTI: <b>${r.comment}</b>` //
   let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
   values('${r.id}','${r.car || ''}','${r.creater}','${r.place}','${r.number || ''}','${r.service}','${r.washer || ''}','${r.comment || ''}')`
