@@ -6,7 +6,6 @@ const cron = require('node-cron')
 const http = require('request')
 
 
-const fs = require('fs');
 const bodyParser = require("body-parser");
 const { json } = require('express');
 const urlencodedParser = bodyParser.json();
@@ -71,7 +70,7 @@ app.get('/all',  (req, res) => {
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
-  let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b>KOMMENTTI: <b>${r.comment}</b>` //
+  let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b> KOMMENTTI: <b>${r.comment}</b>` //
   let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
   values('${r.id}','${r.car || ''}','${r.creater}','${r.place}','${r.number || ''}','${r.service}','${r.washer || ''}','${r.comment || ''}')`
@@ -177,34 +176,5 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
-cron.schedule('59 23 */1 * *', () => {
-  console.log('mail');
-  let date = new Date()
-  let year = date.getFullYear()
-  let month = date.getMonth.length < 2 ? '0' + (+date.getMonth()+1) : (+date.getMonth()+1)
-  let day = date.getDate()
-  let toDay = year +'-' + month +'-' + day
-  conn.query(`SELECT * FROM carsV WHERE date LIKE '%${toDay}%'`,(err,r) => {
-    let output =''
-    for(let i = 0;i < r.length; i++){
-      output += `<p><b>Машина:</b>${r[i].car}
-      <b>Номер:</b>${r[i].number} 
-      <b>Место:</b>${r[i].place === 'K' ? 'Керава' : 'Ванта'} 
-      <b>Тип мойки:</b>${r[i].service} 
-      <b>Мойщик:</b>${r[i].washer} ${r[i].creater}
-      <b>Комментарий:</b> ${r[i].comment} 
-      <b>Дата:</b>${r[i].date.getDate()+'-'+r[i].date.getMonth()
-                    +'-'+r[i].date.getFullYear()+' '+r[i].date.getHours()+
-                    ':'+r[i].date.getMinutes()}</p>`
-  }
-  const message = {
-    from:'Bilar <karlgromov80@mail.ru>',
-    to: "bilar99get@gmail.com", // list of receivers
-    subject: `${day}.${month}.${year}`, // Subject lineg
-    text: 'Кажется машин нет((', 
-    html: output, // html body
-  }
-  mailer(message)
-  })
-})
+
 
