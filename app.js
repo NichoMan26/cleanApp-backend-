@@ -78,17 +78,17 @@ app.post('/', urlencodedParser, (req, res) => {
     if(err) {
       console.log(err)
       }
-      //Telegram bot
-      http.post(`https://api.telegram.org/bot1761813796:AAFkV2cazZksbj4SwtU-M3m40kkMlbjkBnY/sendMessage?chat_id=-519331457&parse_mode=html&text=${msg}`, 
-      function (error, response, body) {  
-        if(response.statusCode===200){
-          res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
-        }
-        if(response.statusCode!==200){
-          res.status(400).json({status: 'error', message: 'Произошла ошибка!'});
-        }
-      });
   })
+  //Telegram bot
+  http.post(`https://api.telegram.org/bot1761813796:AAFkV2cazZksbj4SwtU-M3m40kkMlbjkBnY/sendMessage?chat_id=-1001421796597&parse_mode=html&text=${msg}`, 
+  function (error, response, body) {  
+    if(response.statusCode===200){
+      res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
+    }
+    if(response.statusCode!==200){
+      res.status(400).json({status: 'error', message: 'Произошла ошибка!'});
+    }
+  });
 })
 
 app.post('/report', urlencodedParser, (req, res) => {
