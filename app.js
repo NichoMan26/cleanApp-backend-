@@ -1,16 +1,18 @@
 const express = require('express')
+const app = express()
 const cors = require('cors')
-const mailer = require('./nodeMailer.js')
 const mysql = require('mysql')
-const cron = require('node-cron')
-const http = require('request')
+const request = require('request')
+const http = require('http')
+
+const socketIO = require('socket.io')
+const server = http.createServer(app)
+const io = socketIO(server)
 
 
 const bodyParser = require("body-parser");
-const { json } = require('express');
+const PORT = require('./config.js')
 const urlencodedParser = bodyParser.json();
-const app = express()
-const PORT = process.env.PORT || 5000
 
 const conn = mysql.createConnection({
   host:'basenkodenis.ru',
@@ -26,15 +28,19 @@ conn.connect(err=>{
   } else {
 
     console.log("Database .... OK");
-    app.listen(PORT,() => console.log(`Server has been started on ${PORT}...`))
+    //app.listen(PORT,() => console.log(`Server has been started on ${PORT}...`))
+    server.listen(PORT,() => console.log(`Server has been started on ${PORT}...`))
   }
 })
 
+io.on('connection', (socket) => {
+  socket.emit('lol', 'lol')
+  console.log('socket was connected');
+})
+
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-
-  // authorized headers for preflight requests
-  // https://developer.mozilla.org/en-US/docs/Glossary/preflight_request
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 
@@ -46,6 +52,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors())
+
 
 app.get('/',  (req, res) => {
   let date = new Date()
@@ -80,7 +87,7 @@ app.post('/', urlencodedParser, (req, res) => {
       }
   })
   //Telegram bot
-  http.post(`https://api.telegram.org/bot1761813796:AAFkV2cazZksbj4SwtU-M3m40kkMlbjkBnY/sendMessage?chat_id=-1001421796597&parse_mode=html&text=${msg}`, 
+  request.post(`https://api.telegram.org/bot1761813796:AAFkV2cazZksbj4SwtU-M3m40kkMlbjkBnY/sendMessage?chat_id=-1001421796597&parse_mode=html&text=${msg}`, 
   function (error, response, body) {  
     if(response.statusCode===200){
       res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
