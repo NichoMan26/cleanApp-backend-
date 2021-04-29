@@ -7,13 +7,14 @@ const http = require('http')
 
 const socketIO = require('socket.io')
 const server = http.createServer(app)
-const io = socketIO(server, {
-  cors: {
-    origin: "https://bilar.basenkodenis.ru",
-    methods: ['GET', 'POST', 'DELETE'],
-    credentials: true
-  }
-})
+// const io = socketIO(server, {
+//   cors: {
+//     // origin: "https://bilar.basenkodenis.ru",
+//     origin: "http://localhost:3000",
+//     methods: ['GET', 'POST', 'DELETE'],
+//     credentials: true
+//   }
+// })
 
 
 const bodyParser = require("body-parser");
@@ -39,10 +40,10 @@ conn.connect(err=>{
   }
 })
 
-io.on('connection', (socket) => {
-  socket.emit('lol', 'lol')
-  console.log('socket was connected');
-})
+// io.on('connection', (socket) => {
+//   socket.emit('lol', 'lol')
+//   console.log('socket was connected');
+// })
 
 
 app.use((req, res, next) => {
