@@ -7,7 +7,13 @@ const http = require('http')
 
 const socketIO = require('socket.io')
 const server = http.createServer(app)
-const io = socketIO(server)
+const io = socketIO(server, {
+  cors: {
+    origin: "https://bilar.basenkodenis.ru",
+    methods: ['GET', 'POST', 'DELETE'],
+    credentials: true
+  }
+})
 
 
 const bodyParser = require("body-parser");
