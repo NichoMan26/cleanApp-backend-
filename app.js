@@ -9,8 +9,8 @@ const socketIO = require('socket.io')
 const server = http.createServer(app)
 const io = socketIO(server, {
   cors: {
-    // origin: "https://bilar.basenkodenis.ru",
-    origin: "http://localhost:3000",
+    origin: "https://bilar.basenkodenis.ru",
+    // origin: "http://localhost:3000",
     methods: ['GET', 'POST', 'DELETE'],
     credentials: true
   }
