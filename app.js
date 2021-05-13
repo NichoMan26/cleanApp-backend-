@@ -7,14 +7,14 @@ const http = require('http')
 
 const socketIO = require('socket.io')
 const server = http.createServer(app)
-// const io = socketIO(server, {
-//   cors: {
-//     // origin: "https://bilar.basenkodenis.ru",
-//     origin: "http://localhost:3000",
-//     methods: ['GET', 'POST', 'DELETE'],
-//     credentials: true
-//   }
-// })
+const io = socketIO(server, {
+  cors: {
+    // origin: "https://bilar.basenkodenis.ru",
+    origin: "http://localhost:3000",
+    methods: ['GET', 'POST', 'DELETE'],
+    credentials: true
+  }
+})
 
 
 const bodyParser = require("body-parser");
@@ -40,11 +40,6 @@ conn.connect(err=>{
   }
 })
 
-// io.on('connection', (socket) => {
-//   socket.emit('lol', 'lol')
-//   console.log('socket was connected');
-// })
-
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -60,6 +55,11 @@ app.use((req, res, next) => {
 
 app.use(cors())
 
+let SOCKET = null
+io.on("connection", socket => {
+  SOCKET = socket
+  console.log('socked has connect: ', socket.id);
+})
 
 app.get('/',  (req, res) => {
   let date = new Date()
@@ -75,6 +75,7 @@ app.get('/',  (req, res) => {
     })
 })
 
+
 app.get('/all',  (req, res) => {
   conn.query('SELECT * FROM carsV',(err,result) => {
   res.send(result)
@@ -84,6 +85,7 @@ app.get('/all',  (req, res) => {
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
+  SOCKET.broadcast.emit("newCar", r);
   let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b> KOMMENTTI: <b>${r.comment}</b>` //
   let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
@@ -93,11 +95,13 @@ app.post('/', urlencodedParser, (req, res) => {
       console.log(err)
       }
   })
+ 
   //Telegram bot
   request.post(`https://api.telegram.org/bot1761813796:AAFkV2cazZksbj4SwtU-M3m40kkMlbjkBnY/sendMessage?chat_id=-1001421796597&parse_mode=html&text=${msg}`, 
   function (error, response, body) {  
     if(response.statusCode===200){
       res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
+     
     }
     if(response.statusCode!==200){
       res.status(400).json({status: 'error', message: 'Произошла ошибка!'});
@@ -190,6 +194,4 @@ app.put('/', urlencodedParser, (req, res) => {
     res.sendStatus(200)
   })
 })
-
-
 
