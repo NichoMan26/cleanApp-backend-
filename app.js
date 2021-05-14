@@ -57,7 +57,6 @@ app.use(cors())
 
 let SOCKET = null
 io.on("connection", socket => {
-  SOCKET = socket
   console.log('socked has connect: ', socket.id);
 })
 
@@ -85,7 +84,7 @@ app.get('/all',  (req, res) => {
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
-  SOCKET.broadcast.emit("newCar", r);
+  io.emit("newCar", r);
   let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b> KOMMENTTI: <b>${r.comment}</b>` //
   let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
@@ -137,7 +136,6 @@ app.post('/report', urlencodedParser, (req, res) => {
 
 app.post('/search', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
-  console.log(req.body.searchWord);
   let query = `SELECT * FROM carsV WHERE number LIKE "%${req.body.searchWord }%"`
   
   conn.query(query, (err,result) => {
