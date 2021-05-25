@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 
 app.use(cors())
 
-let SOCKET = null
+
 io.on("connection", socket => {
   console.log('socked has connect: ', socket.id);
 })
@@ -112,20 +112,26 @@ app.post('/report', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let fromTS =  new Date(req.body.from).getTime()
   let toTS =  new Date(req.body.to).getTime()
-  let query = `SELECT *
-              FROM carsV WHERE`
+  let query = `SELECT * FROM carsV WHERE`
   let queryDate = ` id BETWEEN ${fromTS} AND ${toTS}`
   let queryService = ''
-  query += queryDate
-  
+  let queryWasher = ''
+  let queryCreater = ''
+  let queryPlace = ''
   if(req.body.service !== 'All'){
-     queryService = ` AND service = '${req.body.service}'`
+    queryService = ` AND service = '${req.body.service}'`
   }
+  
+  if(req.body.place !== 'All'){
+    queryPlace = ` AND place = '${req.body.place}'`
+  }
+
   if(req.body.washer !== 'All'){
-    query += ` AND washer = '${req.body.washer}'${queryService} OR${queryDate}${queryService} AND creater = '${req.body.washer}'`
-  } else {
-    query += queryService
-  }
+    queryWasher += ` AND washer = '${req.body.washer}'`
+    queryCreater += ` AND creater = '${req.body.washer}'`
+  } 
+  
+  query += queryDate + queryService + queryPlace + queryWasher + ' OR' + queryDate + queryCreater  + queryService + queryPlace
   conn.query(query, (err,result) => {
     if(err) {
       console.log(err)
@@ -133,6 +139,33 @@ app.post('/report', urlencodedParser, (req, res) => {
       res.send(result)
   })
 })
+
+// app.post('/report', urlencodedParser, (req, res) => {
+//   if(!req.body) return res.sendStatus(400)
+//   let fromTS =  new Date(req.body.from).getTime()
+//   let toTS =  new Date(req.body.to).getTime()
+//   let query = `SELECT * FROM carsV WHERE`
+//   let queryDate = ` id BETWEEN ${fromTS} AND ${toTS}`
+//   let queryService = ''
+//   query += queryDate
+  
+//   if(req.body.service !== 'All'){
+//      queryService = ` AND service = '${req.body.service}'`
+//   }
+//   if(req.body.washer !== 'All'){
+//     query += ` AND washer = '${req.body.washer}'${queryService} OR${queryDate}${queryService} AND creater = '${req.body.washer}'`
+//   } else {
+//     query += queryService
+//   }
+//   console.log('query: ', query);
+//   conn.query(query, (err,result) => {
+//     if(err) {
+//       console.log(err)
+//       }
+//       res.send(result)
+//   })
+// })
+
 
 app.post('/search', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
