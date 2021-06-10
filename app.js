@@ -56,9 +56,7 @@ app.use((req, res, next) => {
 app.use(cors())
 
 
-io.on("connection", socket => {
-  console.log('socked has connect: ', socket.id);
-})
+ 
 
 app.get('/',  (req, res) => {
   let date = new Date()
@@ -84,7 +82,7 @@ app.get('/all',  (req, res) => {
 app.post('/', urlencodedParser, (req, res) => {
   if(!req.body) return res.sendStatus(400)
   let r = req.body
-  io.emit("newCar", r);
+  // io.emit("newCar", r); SOCKET
   let msg = `AUTO: <b>${r.car}</b> NUMERO: <b>${r.number}</b> PALVELU: <b>${r.service}</b> Washer:<b>${r.creater}</b>|<b>${r.washer}</b> KOMMENTTI: <b>${r.comment}</b>` //
   let query = `INSERT INTO carsV 
   (id,car,creater,place,number,service,washer,comment) 
@@ -226,3 +224,51 @@ app.put('/', urlencodedParser, (req, res) => {
   })
 })
 
+app.post('/interval', urlencodedParser, (req, res) => {
+  console.log('interval: begin');
+  if(!req.body) return res.sendStatus(400)
+  let r = req.body
+  let query = `INSERT INTO hours 
+  (id,start,finish) 
+  values('${r.id}','${r.start}','${r.finish}')`
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      res.status(400).json({status: 'error', message: 'Произошла ошибка!'});
+    } else {
+      res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
+    }
+  })
+})
+
+app.get('/interval',  (req, res) => {
+    conn.query(`SELECT * FROM hours`,(err,result) => {
+      if(err){
+        console.log('err: ', err);
+      } 
+      res.send(result)
+    })
+})
+
+app.put('/interval', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  let r = req.body
+  let query = `UPDATE hours SET 
+      id='${r.id}',start='${r.start}',finish='${r.finish}'
+      WHERE id='${r.id}'`
+
+
+      // let query = `UPDATE carsV SET 
+      // id='${r.id}',car='${r.car}',creater='${r.creater}',
+      // place='${r.place}',number='${r.number}',service='${r.service}',
+      // washer='${r.washer}',comment='${r.comment}' 
+      // WHERE id='${r.id}'`
+
+
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      }
+    res.sendStatus(200)
+  })
+})
