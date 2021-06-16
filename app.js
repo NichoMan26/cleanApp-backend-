@@ -257,14 +257,17 @@ app.put('/interval', urlencodedParser, (req, res) => {
       id='${r.id}',start='${r.start}',finish='${r.finish}'
       WHERE id='${r.id}'`
 
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      }
+    res.sendStatus(200)
+  })
+})
 
-      // let query = `UPDATE carsV SET 
-      // id='${r.id}',car='${r.car}',creater='${r.creater}',
-      // place='${r.place}',number='${r.number}',service='${r.service}',
-      // washer='${r.washer}',comment='${r.comment}' 
-      // WHERE id='${r.id}'`
-
-
+app.delete('/interval', urlencodedParser, (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+  let query = `DELETE FROM hours WHERE id='${req.body.id}'`
   conn.query(query, (err,result) => {
     if(err) {
       console.log(err)
