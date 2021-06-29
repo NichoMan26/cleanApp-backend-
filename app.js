@@ -275,3 +275,20 @@ app.delete('/interval', urlencodedParser, (req, res) => {
     res.sendStatus(200)
   })
 })
+app.put('/archive', urlencodedParser, (req, res) => {
+  console.log('add in archive');
+  if(!req.body) return res.sendStatus(400)
+  let r = req.body
+  console.log('r: ', r);
+  let query = `UPDATE hours SET 
+      isArchive='${1 }'
+      WHERE id='${r.id}'`
+  conn.query(query, (err,result) => {
+    if(err) {
+      console.log(err)
+      res.status(400).json({status: 'error', message: 'Произошла ошибка!'});
+    } else {
+      res.status(200).json({status: 'ok', message: 'Успешно отправлено!'});
+    }
+  })
+})
