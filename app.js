@@ -4,17 +4,18 @@ const cors = require('cors')
 const mysql = require('mysql')
 const request = require('request')
 const http = require('http')
+const CronJob = require('cron').CronJob
 
-const socketIO = require('socket.io')
+// const socketIO = require('socket.io')
 const server = http.createServer(app)
-const io = socketIO(server, {
-  cors: {
-    origin: "https://bilar.basenkodenis.ru",
-    // origin: "http://localhost:3000",
-    methods: ['GET', 'POST', 'DELETE'],
-    credentials: true
-  }
-})
+// const io = socketIO(server, {
+//   cors: {
+//     origin: "https://bilar.basenkodenis.ru",
+//     // origin: "http://localhost:3000",
+//     methods: ['GET', 'POST', 'DELETE'],
+//     credentials: true
+//   }
+// })
 
 
 const bodyParser = require("body-parser");
@@ -56,7 +57,35 @@ app.use((req, res, next) => {
 app.use(cors())
 
 
- 
+//****CRON START */
+let job = new CronJob('0 0 22 * * *', function() {
+  conn.query(`SELECT * FROM hours WHERE finish='0'`,(err,result) => {
+    if(err){
+      console.log('err: ', err);
+    } 
+    if(result.length !== 0){
+      let query = `UPDATE hours SET 
+      finish='${new Date().getTime()}'
+      WHERE id='${result[0].id}'`
+      conn.query(query, (err,result) => {
+        if(err) {
+          console.log(err)
+          }
+      })
+    }
+  })
+  // let query = `UPDATE hours SET 
+  // id='${r.id}',start='${r.start}',finish='${r.finish}'y
+  // WHERE id='${r.id}'`
+  // conn.query(query, (err,result) => {
+  // if(err) {
+  //   console.log(err)
+  //   }
+  // res.sendStatus(200)
+  // })
+}, null, true, );
+job.start();
+//****CRON FINISH */
 
 app.get('/',  (req, res) => {
   let date = new Date()

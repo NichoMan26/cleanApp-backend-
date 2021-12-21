@@ -10,12 +10,13 @@
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [
-    "Raect"
+    "React"
   ],
   "author": "Basenko Denis [basenkodenis@gmail.com]",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "cron": "^1.8.2",
     "express": "^4.17.1",
     "mysql": "^2.18.1",
     "request": "^2.88.2",
