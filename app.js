@@ -58,12 +58,14 @@ app.use(cors())
 
 
 //****CRON START */
-let job = new CronJob('0 0 22 * * *', function() {
+let job = new CronJob('45 19 * * *', function() {
+  // interval 0 0 22 * * *
   conn.query(`SELECT * FROM hours WHERE finish='0'`,(err,result) => {
     if(err){
       console.log('err: ', err);
     } 
     if(result.length !== 0){
+      console.log('result: ', result);
       let query = `UPDATE hours SET 
       finish='${new Date().getTime()}'
       WHERE id='${result[0].id}'`
