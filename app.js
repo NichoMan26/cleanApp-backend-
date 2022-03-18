@@ -4,7 +4,8 @@ const cors = require('cors')
 const mysql = require('mysql')
 const request = require('request')
 const http = require('http')
-const CronJob = require('cron').CronJob
+const excel = require('exceljs')
+const fs = require('fs')
 
 // const socketIO = require('socket.io')
 const server = http.createServer(app)
@@ -41,7 +42,6 @@ conn.connect(err=>{
   }
 })
 
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -56,38 +56,6 @@ app.use((req, res, next) => {
 
 app.use(cors())
 
-
-//****CRON START */
-let job = new CronJob('45 19 * * *', function() {
-  // interval 0 0 22 * * *
-  conn.query(`SELECT * FROM hours WHERE finish='0'`,(err,result) => {
-    if(err){
-      console.log('err: ', err);
-    } 
-    if(result.length !== 0){
-      console.log('result: ', result);
-      let query = `UPDATE hours SET 
-      finish='${new Date().getTime()}'
-      WHERE id='${result[0].id}'`
-      conn.query(query, (err,result) => {
-        if(err) {
-          console.log(err)
-          }
-      })
-    }
-  })
-  // let query = `UPDATE hours SET 
-  // id='${r.id}',start='${r.start}',finish='${r.finish}'y
-  // WHERE id='${r.id}'`
-  // conn.query(query, (err,result) => {
-  // if(err) {
-  //   console.log(err)
-  //   }
-  // res.sendStatus(200)
-  // })
-}, null, true, );
-job.start();
-//****CRON FINISH */
 
 app.get('/',  (req, res) => {
   let date = new Date()
@@ -161,6 +129,7 @@ app.post('/report', urlencodedParser, (req, res) => {
   } 
   
   query += queryDate + queryService + queryPlace + queryWasher + ' OR' + queryDate + queryCreater  + queryService + queryPlace
+  console.log('query: ', query);
   conn.query(query, (err,result) => {
     if(err) {
       console.log(err)
@@ -168,6 +137,7 @@ app.post('/report', urlencodedParser, (req, res) => {
       res.send(result)
   })
 })
+
 
 // app.post('/report', urlencodedParser, (req, res) => {
 //   if(!req.body) return res.sendStatus(400)
