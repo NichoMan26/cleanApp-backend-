@@ -9,26 +9,14 @@ const fs = require('fs')
 
 // const socketIO = require('socket.io')
 const server = http.createServer(app)
-// const io = socketIO(server, {
-//   cors: {
-//     origin: "https://bilar.basenkodenis.ru",
-//     // origin: "http://localhost:3000",
-//     methods: ['GET', 'POST', 'DELETE'],
-//     credentials: true
-//   }
-// })
+
 
 
 const bodyParser = require("body-parser");
 const PORT = require('./config.js')
 const urlencodedParser = bodyParser.json();
 
-const conn = mysql.createConnection({
-  host:'basenkodenis.ru',
-  user:'u1055291_denis',
-  database:'u1055291_bilar',
-  password:'Bilar99!',
-})
+const conn = "SECRET"
 
 conn.connect(err=>{
   if(err){
